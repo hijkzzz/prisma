@@ -56,7 +56,7 @@ def optimize():
 
     # train_images
     images = reader.image(FLAGS.BATCH_SIZE, FLAGS.IMAGE_SIZE,
-                          FLAGS.TRAIN_IMAGES_PATH)
+                          FLAGS.TRAIN_IMAGES_PATH, FLAGS.EPOCHS)
 
     generated = transform.net(images / 255.)
     net, _ = vgg.net(FLAGS.VGG_PATH, tf.concat(0, [generated, images]))
@@ -81,7 +81,7 @@ def optimize():
 
     variables_to_restore = []
     for v in tf.global_variables():
-        if not(v.name.startswith('vgg19')):
+        if not v.name.startswith('vgg19'):
             variables_to_restore.append(v)
 
     # 开始训练
