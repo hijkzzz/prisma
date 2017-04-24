@@ -116,7 +116,7 @@ def optimize():
                     tf.logging.info('Save model')
 
         except tf.errors.OutOfRangeError:
-            print 'Done training -- epoch limit reached'
+            tf.logging.info('Done training -- epoch limit reached')
         finally:
             coord.request_stop()
 

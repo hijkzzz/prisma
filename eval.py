@@ -1,5 +1,4 @@
 import os
-import time
 import tensorflow as tf
 from scipy import misc
 import vgg
@@ -17,7 +16,7 @@ FLAGS = tf.app.flags.FLAGS
 
 def generate():
     if not FLAGS.CONTENT_IMAGES_PATH:
-        print "train a fast nerual style need to set the Content images path"
+        tf.logging.info("train a fast nerual style need to set the Content images path")
         return
 
     # 要转换的图片
@@ -44,14 +43,14 @@ def generate():
         i = 0
         try:
             while not coord.should_stop():
-                print i
+                tf.logging.info("image {}".format(i))
                 images_t = sess.run(output_format)
 
                 for raw_image in images_t:
                     i += 1
                     misc.imsave('out{0:04d}.png'.format(i), raw_image)
         except tf.errors.OutOfRangeError:
-            print 'Done training -- epoch limit reached'
+            tf.logging.info(' Done training -- epoch limit reached')
         finally:
             coord.request_stop()
 
@@ -59,4 +58,5 @@ def generate():
 
 
 if __name__ == '__main__':
+    tf.logging.set_verbosity(tf.logging.INFO)
     tf.app.run()
