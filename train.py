@@ -1,7 +1,6 @@
-import tensorflow as tf
-from scipy import misc
 import os
 import time
+import tensorflow as tf
 import vgg
 import transform
 import loss
@@ -24,7 +23,7 @@ tf.app.flags.DEFINE_float("STYLE_SCALE", 1.0,
 tf.app.flags.DEFINE_integer("IMAGE_SIZE", 256, "Size of output image")
 tf.app.flags.DEFINE_integer("BATCH_SIZE", 1,
                             "Number of concurrent images to train on")
-tf.app.flags.DEFINE_string("DEVICE", "/gpu:0",
+tf.app.flags.DEFINE_string("DEVICE", "/cpu:0",
                            "Device for training")
 tf.app.flags.DEFINE_string("MODEL_PATH", "models",
                            "Path to read/write trained models")
@@ -87,7 +86,7 @@ def optimize():
 
     # 开始训练
     with tf.Graph().as_default(), tf.device(FLAGS.DEVICE), tf.Session() as sess:
-        saver = tf.train.Saver(variables_to_restore)
+        saver = tf.train.Saver(variables_to_restore, write_version=tf.train.SaverDef.V1)
         sess.run([tf.global_variables_initializer(),
                   tf.local_variables_initializer()])
 
