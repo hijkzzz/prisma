@@ -25,7 +25,9 @@ tf.app.flags.DEFINE_float("STYLE_SCALE", 1.0,
 tf.app.flags.DEFINE_integer("IMAGE_SIZE", 256, "Size of output image")
 tf.app.flags.DEFINE_integer("BATCH_SIZE", 1,
                             "Number of concurrent images to train on")
-tf.app.flags.DEFINE_string("MODEL_PATH", "models/",
+tf.app.flags.DEFINE_string("MODEL_FILE_NAME", "fast-style-model",
+                           "Filename of trained model")
+tf.app.flags.DEFINE_string("MODEL_DIR", "models/",
                            "Path to read/write trained models")
 tf.app.flags.DEFINE_string("VGG_PATH", "imagenet-vgg-verydeep-19.mat",
                            "Path to vgg model weights")
@@ -44,8 +46,8 @@ FLAGS = tf.app.flags.FLAGS
 
 
 def optimize():
-    if not os.path.exists(FLAGS.MODEL_PATH):
-        os.mkdir(FLAGS.MODEL_PATH)
+    if not os.path.exists(FLAGS.MODEL_DIR):
+        os.mkdir(FLAGS.MODEL_DIR)
 
     style_paths = FLAGS.STYLE_IMAGES.split(',')
     style_layers = FLAGS.STYLE_LAYERS.split(',')
@@ -60,7 +62,7 @@ def optimize():
         images = reader.image(FLAGS.BATCH_SIZE, FLAGS.IMAGE_SIZE,
                             FLAGS.TRAIN_IMAGES_PATH, FLAGS.EPOCHS)
 
-        generated = transform.net(images / 255.0)
+        generated = transform.net(images / 255.0, training=True)
         net, _ = vgg.net(FLAGS.VGG_PATH, tf.concat([generated, images], 0))
 
         # 损失函数
@@ -88,12 +90,12 @@ def optimize():
 
         # 开始训练
         saver = tf.train.Saver(variables_to_restore,
-                                write_version=tf.train.SaverDef.V2)
+                                write_version=tf.train.SaverDef.V1)
         sess.run([tf.global_variables_initializer(),
                     tf.local_variables_initializer()])
 
         # 加载检查点
-        ckpt = tf.train.latest_checkpoint(FLAGS.MODEL_PATH)
+        ckpt = tf.train.latest_checkpoint(FLAGS.MODEL_DIR)
         if ckpt:
             tf.logging.info('Restoring model from {}'.format(ckpt))
             saver.restore(sess, ckpt)
@@ -112,13 +114,13 @@ def optimize():
                         'step: %d,  total loss %f, secs/step: %f' % (step, loss_t, elapsed_time))
 
                 if step % 1000 == 0:
-                    saver.save(sess, os.path.join(FLAGS.MODEL_PATH,
-                                                    'fast-style-model.ckpt'), global_step=step)
+                    saver.save(sess, os.path.join(FLAGS.MODEL_DIR,
+                                                    FLAGS.MODEL_FILE_NAME + '.ckpt'), global_step=step)
                     tf.logging.info('Save model')
 
         except tf.errors.OutOfRangeError:
             saver.save(sess, os.path.join(
-                FLAGS.MODEL_PATH, 'fast-style-model-done.ckpt'))
+                FLAGS.MODEL_DIR, FLAGS.MODEL_FILE_NAME + '-done.ckpt'))
             tf.logging.info('Done training -- epoch limit reached')
         finally:
             coord.request_stop()

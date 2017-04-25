@@ -39,11 +39,11 @@ def generate():
     with tf.Graph().as_default(), tf.Session() as sess:
         content_image = reader.get_image(FLAGS.CONTENT_IMAGE, max(height, width))
         content_image = tf.expand_dims(content_image, 0)
-        generated_images = transform.net(content_image / 255.0)
+        generated_images = transform.net(content_image / 255.0, training=False)
         output_format = tf.saturate_cast(generated_images + vgg.MEAN_PIXEL, tf.uint8)
 
         # 开始转换
-        saver = tf.train.Saver(tf.global_variables(), write_version=tf.train.SaverDef.V2)
+        saver = tf.train.Saver(tf.global_variables(), write_version=tf.train.SaverDef.V1)
         sess.run([tf.global_variables_initializer(), tf.local_variables_initializer()])
         model_path = os.path.abspath(FLAGS.MODEL_PATH)
         tf.logging.info('Usage model {}'.format(model_path))

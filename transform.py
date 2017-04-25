@@ -5,7 +5,7 @@ import tensorflow as tf
 
 # 定义图像转换网络
 # 网络基本结构 [ 下采样 -- 残差网络 -- 上采样 ]
-def net(image):
+def net(image, training):
     with tf.variable_scope('conv1'):
         conv1 = tf.nn.relu(_conv2d(image, 3, 32, 9, 1))
     with tf.variable_scope('conv2'):
@@ -23,9 +23,9 @@ def net(image):
     with tf.variable_scope('res5'):
         res5 = _residual(res4, 128, 3, 1)
     with tf.variable_scope('deconv1'):
-        deconv1 = tf.nn.relu(_resize_conv2d(res5, 128, 64, 3, 2))
+        deconv1 = tf.nn.relu(_resize_conv2d(res5, 128, 64, 3, 2, training))
     with tf.variable_scope('deconv2'):
-        deconv2 = tf.nn.relu(_resize_conv2d(deconv1, 64, 32, 3, 2))
+        deconv2 = tf.nn.relu(_resize_conv2d(deconv1, 64, 32, 3, 2, training))
     with tf.variable_scope('deconv3'):
         deconv3 = tf.nn.tanh(_conv2d(deconv2, 32, 3, 9, 1))
 
@@ -46,25 +46,7 @@ def _conv2d(x, input_filters, output_filters, kernel, strides, padding='SAME'):
 
         return normalized
 
-
-def _conv2d_transpose(x, input_filters, output_filters, kernel, strides, padding='SAME'):
-    with tf.variable_scope('conv_transpose') as scope:
-
-        shape = [kernel, kernel, output_filters, input_filters]
-        weight = tf.Variable(tf.truncated_normal(
-            shape, stddev=0.1), name='weight')
-
-        batch_size = tf.shape(x)[0]
-        height = tf.shape(x)[1] * strides
-        width = tf.shape(x)[2] * strides
-        output_shape = tf.stack([batch_size, height, width, output_filters])
-        convolved = tf.nn.conv2d_transpose(x, weight, output_shape, strides=[
-                                           1, strides, strides, 1], padding=padding, name='conv_transpose')
-
-        normalized = _instance_norm(convolved)
-        return normalized
-
-def _resize_conv2d(x, input_filters, output_filters, kernel, strides):
+def _resize_conv2d(x, input_filters, output_filters, kernel, strides, training):
     '''
     An alternative to transposed convolution where we first resize, then convolve.
     See http://distill.pub/2016/deconv-checkerboard/
