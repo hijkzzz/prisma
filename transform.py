@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import tensorflow as tf
 
 
@@ -74,8 +76,8 @@ def _instance_norm(x):
 
 def _residual(x, filters, kernel, strides, padding='SAME'):
     with tf.variable_scope('residual') as scope:
-        conv1 = conv2d(x, filters, filters, kernel, strides, padding=padding)
-        conv2 = conv2d(tf.nn.relu(conv1), filters, filters,
+        conv1 = _conv2d(x, filters, filters, kernel, strides, padding=padding)
+        conv2 = _conv2d(tf.nn.relu(conv1), filters, filters,
                        kernel, strides, padding=padding)
         residual = x + conv2
 

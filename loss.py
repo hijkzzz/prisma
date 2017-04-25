@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import tensorflow as tf
 import vgg
 import reader
@@ -17,7 +19,7 @@ def gram(layer):
 
 
 def get_style_features(style_paths, style_layers, image_size, style_scale, vgg_path):
-    with tf.Graph().as_default():
+    with tf.Graph().as_default(), tf.Session() as sess:
         size = int(round(image_size * style_scale))
         images = tf.stack(
             [reader.get_image(path, size) for path in style_paths])
@@ -26,21 +28,18 @@ def get_style_features(style_paths, style_layers, image_size, style_scale, vgg_p
         for layer in style_layers:
             features.append(gram(net[layer]))
 
-    with tf.Session() as sess:
         return sess.run(features)
 
 
 def style_loss(net, style_features_t, style_layers):
     style_loss = 0
-    style_loss_summary = {}
     for style_gram, layer in zip(style_features_t, style_layers):
         generated_images, _ = tf.split(net[layer], 2, 0)
         size = tf.size(generated_images)
         layer_style_loss = tf.nn.l2_loss(
             gram(generated_images) - style_gram) * 2 / tf.to_float(size)
-        style_loss_summary[layer] = layer_style_loss
         style_loss += layer_style_loss
-    return style_loss, style_loss_summary
+    return style_loss
 
 
 def content_loss(net, content_layers):

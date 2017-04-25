@@ -1,2 +1,7 @@
-.vscode
+.vscode/
+.DS_Store
 tags
+*.pyc
+train2014/
+models/
+imagenet-vgg-verydeep-19.mat

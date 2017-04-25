@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import os
 import time
 import tensorflow as tf
@@ -25,13 +27,13 @@ tf.app.flags.DEFINE_integer("BATCH_SIZE", 1,
                             "Number of concurrent images to train on")
 tf.app.flags.DEFINE_string("DEVICE", "/cpu:0",
                            "Device for training")
-tf.app.flags.DEFINE_string("MODEL_PATH", "models",
+tf.app.flags.DEFINE_string("MODEL_PATH", "models/",
                            "Path to read/write trained models")
 tf.app.flags.DEFINE_string("SUMMARY_PATH", "tensorboard",
                            "Path to store Tensorboard summaries")
 tf.app.flags.DEFINE_string("VGG_PATH", "imagenet-vgg-verydeep-19.mat",
                            "Path to vgg model weights")
-tf.app.flags.DEFINE_string("TRAIN_IMAGES_PATH", "train2014",
+tf.app.flags.DEFINE_string("TRAIN_IMAGES_PATH", "train2014/",
                            "Path to training images")
 tf.app.flags.DEFINE_string("CONTENT_LAYERS", "relu4_2",
                            "Which VGG layer to extract content loss from")
@@ -52,43 +54,44 @@ def optimize():
 
     # style gram matrix
     style_features_t = loss.get_style_features(style_paths, style_layers,
-                                               FLAGS.IMAGE_SIZE, FLAGS.STYLE_SCALE, FLAGS.VGG_PATH)
+                                                FLAGS.IMAGE_SIZE, FLAGS.STYLE_SCALE, FLAGS.VGG_PATH)
 
-    # train_images
-    images = reader.image(FLAGS.BATCH_SIZE, FLAGS.IMAGE_SIZE,
-                          FLAGS.TRAIN_IMAGES_PATH, FLAGS.EPOCHS)
-
-    generated = transform.net(images / 255.)
-    net, _ = vgg.net(FLAGS.VGG_PATH, tf.concat(0, [generated, images]))
-
-    # 损失函数
-    content_loss = loss.content_loss(net, content_layers)
-    style_loss = loss.style_loss(net, style_features_t, style_layers)
-
-    total_loss = FLAGS.STYLE_WEIGHT * style_loss + FLAGS.CONTENT_WEIGHT * content_loss +
-        FLAGS.TV_WEIGHT * loss.total_variation_loss(generated)
-
-    # 准备训练
-    global_step = tf.Variable(0, name="global_step", trainable=False)
-
-    variable_to_train = []
-    for variable in tf.trainable_variables():
-        if not variable.name.startswith('vgg19'):
-            variable_to_train.append(variable)
-
-    train_op = tf.train.AdamOptimizer(FLAGS.LEARNING_RATE).minimize(
-        total_loss, global_step=global_step, var_list=variable_to_train)
-
-    variables_to_restore = []
-    for v in tf.global_variables():
-        if not v.name.startswith('vgg19'):
-            variables_to_restore.append(v)
-
-    # 开始训练
     with tf.Graph().as_default(), tf.device(FLAGS.DEVICE), tf.Session() as sess:
-        saver = tf.train.Saver(variables_to_restore, write_version=tf.train.SaverDef.V1)
+        # train_images
+        images, _ = reader.image(FLAGS.BATCH_SIZE, FLAGS.IMAGE_SIZE,
+                            FLAGS.TRAIN_IMAGES_PATH, FLAGS.EPOCHS)
+
+        generated = transform.net(images)
+        net, _ = vgg.net(FLAGS.VGG_PATH, tf.concat([generated, images], 0))
+
+        # 损失函数
+        content_loss = loss.content_loss(net, content_layers)
+        style_loss = loss.style_loss(net, style_features_t, style_layers) / len(style_paths)
+
+        total_loss = FLAGS.STYLE_WEIGHT * style_loss + FLAGS.CONTENT_WEIGHT * content_loss + \
+            FLAGS.TV_WEIGHT * loss.total_variation_loss(generated)
+
+        # 准备训练
+        global_step = tf.Variable(0, name="global_step", trainable=False)
+
+        variable_to_train = []
+        for variable in tf.trainable_variables():
+            if not variable.name.startswith('vgg19'):
+                variable_to_train.append(variable)
+
+        train_op = tf.train.AdamOptimizer(FLAGS.LEARNING_RATE).minimize(
+            total_loss, global_step=global_step, var_list=variable_to_train)
+
+        variables_to_restore = []
+        for v in tf.global_variables():
+            if not v.name.startswith('vgg19'):
+                variables_to_restore.append(v)
+
+        # 开始训练
+        saver = tf.train.Saver(variables_to_restore,
+                                write_version=tf.train.SaverDef.V1)
         sess.run([tf.global_variables_initializer(),
-                  tf.local_variables_initializer()])
+                    tf.local_variables_initializer()])
 
         # 加载检查点
         ckpt = tf.train.latest_checkpoint(FLAGS.MODEL_PATH)
@@ -112,10 +115,12 @@ def optimize():
 
                 if step % 1000 == 0:
                     saver.save(sess, os.path.join(FLAGS.MODEL_PATH,
-                                                  'fast-style-model.ckpt'), global_step=step)
+                                                    'fast-style-model.ckpt'), global_step=step)
                     tf.logging.info('Save model')
 
         except tf.errors.OutOfRangeError:
+            saver.save(sess, os.path.join(
+                FLAGS.MODEL_PATH, 'fast-style-model-done.ckpt'))
             tf.logging.info('Done training -- epoch limit reached')
         finally:
             coord.request_stop()
@@ -125,4 +130,4 @@ def optimize():
 
 if __name__ == '__main__':
     tf.logging.set_verbosity(tf.logging.INFO)
-    tf.app.run()
+    optimize()
