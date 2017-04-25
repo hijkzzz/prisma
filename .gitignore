@@ -4,4 +4,5 @@ tags
 *.pyc
 train2014/
 models/
+output/
 imagenet-vgg-verydeep-19.mat

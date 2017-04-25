@@ -89,7 +89,7 @@ def optimize():
 
         # 开始训练
         saver = tf.train.Saver(variables_to_restore,
-                                write_version=tf.train.SaverDef.V1)
+                                write_version=tf.train.SaverDef.V2)
         sess.run([tf.global_variables_initializer(),
                     tf.local_variables_initializer()])
 
@@ -99,7 +99,6 @@ def optimize():
             tf.logging.info('Restoring model from {}'.format(ckpt))
             saver.restore(sess, ckpt)
 
-        sess.run(tf.initialize_local_variables())
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(coord=coord)
         start_time = time.time()

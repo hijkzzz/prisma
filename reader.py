@@ -1,6 +1,7 @@
 # coding=utf-8
 
-import os
+from os import listdir, remove
+from os.path import exists, join, isfile, basename
 import tensorflow as tf
 import vgg
 
@@ -33,8 +34,11 @@ def get_image(path, size, max_length=True):
 
 
 def image(batch_size, size, path, epochs=2, shuffle=True, crop=True):
-    filenames = [os.path.join(path, f) for f in os.listdir(
-        path) if os.path.isfile(os.path.join(path, f))]
+    # for macOS
+    if exists(join(path, '.DS_Store')):
+        remove(join(path, '.DS_Store'))
+
+    filenames = [join(path, f) for f in listdir(path) if isfile(join(path, f))]
     if not shuffle:
         filenames = sorted(filenames)
 
@@ -51,10 +55,10 @@ def image(batch_size, size, path, epochs=2, shuffle=True, crop=True):
 
     processed_image = preprocess(image, size, False)
     if not crop:
-        return tf.train.batch([processed_image], batch_size, dynamic_pad=True)
+        return tf.train.batch([processed_image], batch_size, dynamic_pad=True), map(basename, filenames)
 
     cropped_image = tf.slice(processed_image, [0, 0, 0], [size, size, 3])
     cropped_image.set_shape((size, size, 3))
 
     images = tf.train.batch([cropped_image], batch_size)
-    return images, map(os.path.basename, filenames)
+    return images, map(basename, filenames)
