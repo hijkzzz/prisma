@@ -19,7 +19,7 @@ tf.app.flags.DEFINE_integer("LEARNING_RATE", 1e-3,
                             "Learning rate for training")
 tf.app.flags.DEFINE_integer("EPOCHS", 2,
                             "Num epochs")
-tf.app.flags.DEFINE_string("STYLE_IMAGES", None, "Styles to train")
+tf.app.flags.DEFINE_string("STYLE_IMAGES", "style-image.png", "Styles to train")
 tf.app.flags.DEFINE_float("STYLE_SCALE", 1.0,
                           "Scale styles. Higher extracts smaller features")
 tf.app.flags.DEFINE_integer("IMAGE_SIZE", 256, "Size of output image")
@@ -57,10 +57,10 @@ def optimize():
 
     with tf.Graph().as_default(), tf.Session() as sess:
         # train_images
-        images, _ = reader.image(FLAGS.BATCH_SIZE, FLAGS.IMAGE_SIZE,
+        images = reader.image(FLAGS.BATCH_SIZE, FLAGS.IMAGE_SIZE,
                             FLAGS.TRAIN_IMAGES_PATH, FLAGS.EPOCHS)
 
-        generated = transform.net(images)
+        generated = transform.net(images / 255.0)
         net, _ = vgg.net(FLAGS.VGG_PATH, tf.concat([generated, images], 0))
 
         # 损失函数
@@ -107,7 +107,7 @@ def optimize():
                 elapsed_time = time.time() - start_time
                 start_time = time.time()
 
-                if step % 20 == 0:
+                if step % 10 == 0:
                     tf.logging.info(
                         'step: %d,  total loss %f, secs/step: %f' % (step, loss_t, elapsed_time))
 

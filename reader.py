@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from os import listdir, remove
-from os.path import exists, join, isfile, basename
+from os.path import exists, join, isfile
 import tensorflow as tf
 import vgg
 
@@ -55,10 +55,9 @@ def image(batch_size, size, path, epochs=2, shuffle=True, crop=True):
 
     processed_image = preprocess(image, size, False)
     if not crop:
-        return tf.train.batch([processed_image], batch_size, dynamic_pad=True), map(basename, filenames)
-
+        return tf.train.batch([processed_image], batch_size, dynamic_pad=True)
     cropped_image = tf.slice(processed_image, [0, 0, 0], [size, size, 3])
     cropped_image.set_shape((size, size, 3))
 
     images = tf.train.batch([cropped_image], batch_size)
-    return images, map(basename, filenames)
+    return images
