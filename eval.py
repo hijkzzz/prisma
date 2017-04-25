@@ -24,9 +24,9 @@ def generate():
     # 获取图片信息
     height = 0
     width = 0
-    with open(FLAGS.image_file, 'rb') as img:
+    with open(FLAGS.CONTENT_IMAGE, 'rb') as img:
         with tf.Session().as_default() as sess:
-            if FLAGS.image_file.lower().endswith('png'):
+            if FLAGS.CONTENT_IMAGE.lower().endswith('png'):
                 image = sess.run(tf.image.decode_png(img.read()))
             else:
                 image = sess.run(tf.image.decode_jpeg(img.read()))
