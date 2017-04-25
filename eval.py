@@ -11,7 +11,6 @@ tf.app.flags.DEFINE_string("MODEL_FILE", "models/fast-style-model-done.ckpt", "P
 tf.app.flags.DEFINE_string("CONTENT_IMAGE", None, "Path to content image")
 tf.app.flags.DEFINE_string("OUTPUT_PATH", "output/", "Path to output image(s)")
 tf.app.flags.DEFINE_integer("BATCH_SIZE", 1, "Number of concurrent images to train on")
-tf.app.flags.DEFINE_string("DEVICE", "/cpu:0", "Device for training")
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -34,7 +33,7 @@ def generate():
             width = image.shape[1]
     tf.logging.info('Image size: %dx%d' % (width, height))
 
-    with tf.Graph().as_default(), tf.device(FLAGS.DEVICE), tf.Session() as sess:
+    with tf.Graph().as_default(), tf.Session() as sess:
         content_image = reader.get_image(FLAGS.CONTENT_IMAGE, max(height, width))
         generated_images = transform.net(content_image)
         output_format = tf.saturate_cast(generated_images + vgg.MEAN_PIXEL, tf.uint8)

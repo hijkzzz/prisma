@@ -25,12 +25,8 @@ tf.app.flags.DEFINE_float("STYLE_SCALE", 1.0,
 tf.app.flags.DEFINE_integer("IMAGE_SIZE", 256, "Size of output image")
 tf.app.flags.DEFINE_integer("BATCH_SIZE", 1,
                             "Number of concurrent images to train on")
-tf.app.flags.DEFINE_string("DEVICE", "/cpu:0",
-                           "Device for training")
 tf.app.flags.DEFINE_string("MODEL_PATH", "models/",
                            "Path to read/write trained models")
-tf.app.flags.DEFINE_string("SUMMARY_PATH", "tensorboard",
-                           "Path to store Tensorboard summaries")
 tf.app.flags.DEFINE_string("VGG_PATH", "imagenet-vgg-verydeep-19.mat",
                            "Path to vgg model weights")
 tf.app.flags.DEFINE_string("TRAIN_IMAGES_PATH", "train2014/",
@@ -42,6 +38,9 @@ tf.app.flags.DEFINE_string("STYLE_LAYERS",
                            "Which layers to extract style from")
 
 FLAGS = tf.app.flags.FLAGS
+
+# how to select GPU
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 
 def optimize():
@@ -56,7 +55,7 @@ def optimize():
     style_features_t = loss.get_style_features(style_paths, style_layers,
                                                 FLAGS.IMAGE_SIZE, FLAGS.STYLE_SCALE, FLAGS.VGG_PATH)
 
-    with tf.Graph().as_default(), tf.device(FLAGS.DEVICE), tf.Session() as sess:
+    with tf.Graph().as_default(), tf.Session() as sess:
         # train_images
         images, _ = reader.image(FLAGS.BATCH_SIZE, FLAGS.IMAGE_SIZE,
                             FLAGS.TRAIN_IMAGES_PATH, FLAGS.EPOCHS)
