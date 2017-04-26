@@ -1,8 +1,14 @@
 .vscode/
 .DS_Store
 tags
+
 *.pyc
-train2014/
+raw-images/
+output-images/
 models/
-output/
+
+style-image.png
 imagenet-vgg-verydeep-19.mat
+train2014/
+
+redis-stable/

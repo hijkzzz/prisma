@@ -25,9 +25,7 @@ tf.app.flags.DEFINE_float("STYLE_SCALE", 1.0,
 tf.app.flags.DEFINE_integer("IMAGE_SIZE", 256, "Size of output image")
 tf.app.flags.DEFINE_integer("BATCH_SIZE", 1,
                             "Number of concurrent images to train on")
-tf.app.flags.DEFINE_string("MODEL_FILE_NAME", "fast-style-model",
-                           "Filename of trained model")
-tf.app.flags.DEFINE_string("MODEL_DIR", "models/",
+tf.app.flags.DEFINE_string("MODEL_PATH", "models/fast-style-transfer.ckpt",
                            "Path to read/write trained models")
 tf.app.flags.DEFINE_string("VGG_PATH", "imagenet-vgg-verydeep-19.mat",
                            "Path to vgg model weights")
@@ -46,8 +44,9 @@ FLAGS = tf.app.flags.FLAGS
 
 
 def optimize():
-    if not os.path.exists(FLAGS.MODEL_DIR):
-        os.mkdir(FLAGS.MODEL_DIR)
+    MODEL_DIR_NAME = os.path.dirname(FLAGS.MODEL_PATH) 
+    if not os.path.exists(MODEL_DIR_NAME):
+        os.mkdir(MODEL_DIR_NAME)
 
     style_paths = FLAGS.STYLE_IMAGES.split(',')
     style_layers = FLAGS.STYLE_LAYERS.split(',')
@@ -95,7 +94,7 @@ def optimize():
                     tf.local_variables_initializer()])
 
         # 加载检查点
-        ckpt = tf.train.latest_checkpoint(FLAGS.MODEL_DIR)
+        ckpt = tf.train.latest_checkpoint(MODEL_DIR_NAME))
         if ckpt:
             tf.logging.info('Restoring model from {}'.format(ckpt))
             saver.restore(sess, ckpt)
@@ -114,13 +113,11 @@ def optimize():
                         'step: %d,  total loss %f, secs/step: %f' % (step, loss_t, elapsed_time))
 
                 if step % 1000 == 0:
-                    saver.save(sess, os.path.join(FLAGS.MODEL_DIR,
-                                                    FLAGS.MODEL_FILE_NAME + '.ckpt'), global_step=step)
+                    saver.save(sess, FLAGS.MODEL_PATH, global_step=step)
                     tf.logging.info('Save model')
 
         except tf.errors.OutOfRangeError:
-            saver.save(sess, os.path.join(
-                FLAGS.MODEL_DIR, FLAGS.MODEL_FILE_NAME + '-done.ckpt'))
+            saver.save(sess,  FLAGS.MODEL_PATH + '-done'))
             tf.logging.info('Done training -- epoch limit reached')
         finally:
             coord.request_stop()
