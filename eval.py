@@ -9,7 +9,7 @@ import reader
 
 tf.app.flags.DEFINE_string("MODEL_PATH", "models/fast-style-model.ckpt-done", "Pre-trained models")
 tf.app.flags.DEFINE_string("CONTENT_IMAGE", "raw-images/content-image.png", "Path to content image")
-tf.app.flags.DEFINE_string("OUTPUT_PATH", "output-images/", "Path to output image")
+tf.app.flags.DEFINE_string("OUTPUT_FOLDER", "output-images/", "Path to output image")
 tf.app.flags.DEFINE_integer("BATCH_SIZE", 1, "Number of concurrent images to train on")
 
 FLAGS = tf.app.flags.FLAGS
@@ -20,8 +20,8 @@ def generate():
         tf.logging.info("train a fast nerual style need to set the Content images path")
         return
 
-    if not os.path.exists(FLAGS.OUTPUT_PATH):
-        os.mkdir(FLAGS.OUTPUT_PATH)
+    if not os.path.exists(FLAGS.OUTPUT_FOLDER):
+        os.mkdir(FLAGS.OUTPUT_FOLDER)
 
     # 获取图片信息
     height = 0
@@ -55,7 +55,7 @@ def generate():
         images_t = sess.run(output_format)
 
         assert len(images_t) == 1
-        misc.imsave(os.path.join(FLAGS.OUTPUT_PATH,
+        misc.imsave(os.path.join(FLAGS.OUTPUT_FOLDER,
                         'output-' + filename), images_t[0])
 
 

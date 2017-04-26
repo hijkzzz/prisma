@@ -29,7 +29,7 @@ tf.app.flags.DEFINE_string("MODEL_PATH", "models/fast-style-transfer.ckpt",
                            "Path to read/write trained models")
 tf.app.flags.DEFINE_string("VGG_PATH", "imagenet-vgg-verydeep-19.mat",
                            "Path to vgg model weights")
-tf.app.flags.DEFINE_string("TRAIN_IMAGES_PATH", "train2014/",
+tf.app.flags.DEFINE_string("TRAIN_IMAGES_FOLDER", "train2014/",
                            "Path to training images")
 tf.app.flags.DEFINE_string("CONTENT_LAYERS", "relu4_2",
                            "Which VGG layer to extract content loss from")
@@ -59,7 +59,7 @@ def optimize():
     with tf.Graph().as_default(), tf.Session() as sess:
         # train_images
         images = reader.image(FLAGS.BATCH_SIZE, FLAGS.IMAGE_SIZE,
-                            FLAGS.TRAIN_IMAGES_PATH, FLAGS.EPOCHS)
+                            FLAGS.TRAIN_IMAGES_FOLDER, FLAGS.EPOCHS)
 
         generated = transform.net(images / 255.0, training=True)
         net, _ = vgg.net(FLAGS.VGG_PATH, tf.concat([generated, images], 0))
@@ -94,7 +94,7 @@ def optimize():
                     tf.local_variables_initializer()])
 
         # 加载检查点
-        ckpt = tf.train.latest_checkpoint(MODEL_DIR_NAME))
+        ckpt = tf.train.latest_checkpoint(MODEL_DIR_NAME)
         if ckpt:
             tf.logging.info('Restoring model from {}'.format(ckpt))
             saver.restore(sess, ckpt)
@@ -117,7 +117,7 @@ def optimize():
                     tf.logging.info('Save model')
 
         except tf.errors.OutOfRangeError:
-            saver.save(sess,  FLAGS.MODEL_PATH + '-done'))
+            saver.save(sess,  FLAGS.MODEL_PATH + '-done')
             tf.logging.info('Done training -- epoch limit reached')
         finally:
             coord.request_stop()
