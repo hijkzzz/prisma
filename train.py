@@ -20,11 +20,11 @@ tf.app.flags.DEFINE_integer("LEARNING_RATE", 1e-3,
 tf.app.flags.DEFINE_integer("EPOCHS", 2,
                             "Num epochs")
 tf.app.flags.DEFINE_string(
-    "STYLE_IMAGES", "style-image.png", "Styles to train")
+    "STYLE_IMAGES", "style-images/style-image.png", "Styles to train")
 tf.app.flags.DEFINE_float("STYLE_SCALE", 1.0,
                           "Scale styles. Higher extracts smaller features")
 tf.app.flags.DEFINE_integer("IMAGE_SIZE", 256, "Size of output image")
-tf.app.flags.DEFINE_integer("BATCH_SIZE", 1,
+tf.app.flags.DEFINE_integer("BATCH_SIZE", 4,
                             "Number of concurrent images to train on")
 tf.app.flags.DEFINE_string("MODEL_PATH", "models/fast-style-transfer.ckpt",
                            "Path to read/write trained models")
@@ -114,7 +114,7 @@ def optimize():
                     tf.logging.info(
                         'step: %d,  total loss %f, secs/step: %f' % (step, loss_t, elapsed_time))
 
-                if step % 1000 == 0:
+                if step % 10000 == 0:
                     saver.save(sess, FLAGS.MODEL_PATH, global_step=step)
                     tf.logging.info('Save model')
 

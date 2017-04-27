@@ -7,7 +7,6 @@ raw-images/
 output-images/
 models/
 
-style-image.png
 imagenet-vgg-verydeep-19.mat
 train2014/
 
