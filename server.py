@@ -79,7 +79,11 @@ def transform_async(filename, email, model):
                 msg.attach(filename, mime_type, f.read())
             mail.send(msg)
     else:
-        pass
+        with app.app_context():
+            msg = Message("IMAGE-STYLE-TRANSFER",
+                        sender=app.config['MAIL_USERNAME'], recipients=[email])
+            msg.body = "CONVERT ERROR\n" + filename
+            mail.send(msg)
 
     remove_files.apply_async(
         args=[[content_file_path, output_file_path]], countdown=60)

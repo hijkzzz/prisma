@@ -16,5 +16,5 @@ ALLOWED_EXTENSIONS = set(['.png', '.jpg', '.jpeg'])
 MAX_CONTENT_LENGTH = 4 * 1024 * 1024
 
 MODEL_FOLDER = 'models/'
-MODEL_FILES = set(['mosaic.ckpt'])
+MODEL_FILES = set(['shinkai.ckpt'])
 OUTPUT_FOLDER = 'output-images/'
