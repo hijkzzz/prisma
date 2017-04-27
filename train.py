@@ -9,13 +9,13 @@ import loss
 import reader
 
 
-tf.app.flags.DEFINE_integer("CONTENT_WEIGHT", 1,
+tf.app.flags.DEFINE_float("CONTENT_WEIGHT", 1.0,
                             "Weight for content features loss")
-tf.app.flags.DEFINE_integer("STYLE_WEIGHT", 150,
+tf.app.flags.DEFINE_float("STYLE_WEIGHT", 5.0,
                             "Weight for style features loss")
-tf.app.flags.DEFINE_integer("TV_WEIGHT", 0,
+tf.app.flags.DEFINE_float("TV_WEIGHT", 1e-6,
                             "Weight for total variation loss")
-tf.app.flags.DEFINE_integer("LEARNING_RATE", 1e-3,
+tf.app.flags.DEFINE_float("LEARNING_RATE", 1e-3,
                             "Learning rate for training")
 tf.app.flags.DEFINE_integer("EPOCHS", 2,
                             "Num epochs")
