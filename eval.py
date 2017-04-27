@@ -55,8 +55,7 @@ def generate():
         images_t = sess.run(output_format)
 
         assert len(images_t) == 1
-        misc.imsave(os.path.join(FLAGS.OUTPUT_FOLDER,
-                        'output-' + filename), images_t[0])
+        misc.imsave(os.path.join(FLAGS.OUTPUT_FOLDER, filename), images_t[0])
 
 
 if __name__ == '__main__':

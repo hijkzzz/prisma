@@ -1,16 +1,19 @@
 # coding=utf-8
 from flask import Flask, request, jsonify
+from flask_mail import Mail, Message
 from celery import Celery
+from os import mkdir, remove 
+from os.path import join, exists, splitext
 import re
-from os import mkdir
-from os.path import join, exists
 import time
 import base64
 import commands
 
-app = Flask(__name__)
-app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_pyfile('default_config.py')
+mail = Mail(app)
 celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)
 
 
 @app.route('/transform', methods=['POST'])
@@ -25,7 +28,7 @@ def transform():
     # 检查参数
     if filename is None or image is None or email is None or model is None:
         return jsonify(status='PARAMS ERROR')
-    if os.path.splitext(filename)[1] not in app.config['ALLOWED_EXTENSIONS']:
+    if splitext(filename)[1] not in app.config['ALLOWED_EXTENSIONS']:
         return jsonify(status='FILENAME NOT SUPPORT')
     if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", email) is None:
         return jsonify(status='EMAIL FORMAT ERROR')
@@ -46,47 +49,44 @@ def transform():
 def transform_async(filename, image, email, model):
     # 保存图片
     filename = str(time.time()) + '-' + filename
-    with open(join(app.config['UPLOAD_FOLDER'], filename)) as f:
+    with open(join(app.config['UPLOAD_FOLDER'], filename), 'wb') as f:
         f.write(image)
 
-    # 执行任务
+    # 转换图片 
     content_file_path = join(app.config['UPLOAD_FOLDER'], filename)
     model_file_path = join(app.config['MODEL_FOLDER'], model)
     output_folder = app.config['OUTPUT_FOLDER']
     command = 'python eval.py --CONTENT_IMAG %s --MODEL_PATH %s -- OUTPUT_FOLDER %s' % (
         content_file_path, model_file_path, output_folder)
-    status, _ = commands.getstatusoutput(command)
+    status, output = commands.getstatusoutput(command)
 
-    # 返回状态
+    # 发送邮件
     if status == 0:
-        pass
+        msg = Message("IMAGE-STYLE-TRANSFER", sender=app.config['MAIL_USERNAME'], recipients=[email])
+        msg.body = filename
+        output_file_path = join(output_folder, filename)
+        with app.open_resource(output_file_path) as f:
+            mime_type = 'image/jpg' if splitext(filename)[1] is not 'png' else 'image/png'
+            msg.attach(filename, mime_type, f.read())
+        with app.app_context():
+            mail.send(msg)
     else:
         pass
 
-
-@app.route('/status', methods=['GET'])
-def status():
-    pass
+    remove_files.apply_async(args=[[content_file_path, output_file_path]], countdown=180)
 
 
-def config(app):
-    app.config['ALLOWED_EXTENSIONS'] = set(['png', 'jpg', 'jpeg'])
-    app.config['UPLOAD_FOLDER'] = 'raw-images/'
-    app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024
+@celery.task
+def remove_files(file_list):
+    for file in file_list:
+        if exists(file):
+            remove(file)
 
-    app.config['MODEL_FOLDER'] = 'models/'
-    app.config['MODEL_FILES'] = set(['fast-style-transfer.ckpt-done'])
-    app.config['OUTPUT_FOLDER'] = 'output-images/'
 
-    app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-    celery.conf.update(app.config)
-
+if __name__ == '__main__':
     if not exists(app.config['UPLOAD_FOLDER']):
         mkdir(app.config['UPLOAD_FOLDER'])
     if not exists(app.config['OUTPUT_FOLDER']):
         mkdir(app.config['OUTPUT_FOLDER'])
 
-
-if __name__ == '__main__':
-    config(app)
     app.run()

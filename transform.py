@@ -35,7 +35,7 @@ def net(image, training):
 
 
 def _conv2d(x, input_filters, output_filters, kernel, strides, padding='SAME'):
-    with tf.variable_scope('conv') as scope:
+    with tf.variable_scope('conv'):
 
         shape = [kernel, kernel, input_filters, output_filters]
         weight = tf.Variable(tf.truncated_normal(
@@ -45,6 +45,7 @@ def _conv2d(x, input_filters, output_filters, kernel, strides, padding='SAME'):
         normalized = _instance_norm(convolved)
 
         return normalized
+
 
 def _resize_conv2d(x, input_filters, output_filters, kernel, strides, training):
     '''
@@ -62,7 +63,8 @@ def _resize_conv2d(x, input_filters, output_filters, kernel, strides, training):
         new_height = height * strides * 2
         new_width = width * strides * 2
 
-        x_resized = tf.image.resize_images(x, [new_height, new_width], tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+        x_resized = tf.image.resize_images(
+            x, [new_height, new_width], tf.image.ResizeMethod.NEAREST_NEIGHBOR)
 
         # shape = [kernel, kernel, input_filters, output_filters]
         # weight = tf.Variable(tf.truncated_normal(shape, stddev=0.1), name='weight')
@@ -81,7 +83,7 @@ def _residual(x, filters, kernel, strides, padding='SAME'):
     with tf.variable_scope('residual') as scope:
         conv1 = _conv2d(x, filters, filters, kernel, strides, padding=padding)
         conv2 = _conv2d(tf.nn.relu(conv1), filters, filters,
-                       kernel, strides, padding=padding)
+                        kernel, strides, padding=padding)
         residual = x + conv2
 
         return residual
