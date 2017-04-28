@@ -11,7 +11,7 @@ import reader
 
 tf.app.flags.DEFINE_float("CONTENT_WEIGHT", 1.0,
                             "Weight for content features loss")
-tf.app.flags.DEFINE_float("STYLE_WEIGHT", 5.0,
+tf.app.flags.DEFINE_float("STYLE_WEIGHT", 10.0,
                             "Weight for style features loss")
 tf.app.flags.DEFINE_float("TV_WEIGHT", 1e-6,
                             "Weight for total variation loss")

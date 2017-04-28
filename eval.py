@@ -50,6 +50,8 @@ def generate():
         saver.restore(sess, model_path)
 
         filename = os.path.basename(FLAGS.CONTENT_IMAGE)
+        (shotname, extension) = os.path.splitext(filename)
+        filename = shotname + '-' + os.path.basename(FLAGS.MODEL_PATH) + extension
 
         tf.logging.info("image {}".format(filename))
         images_t = sess.run(output_format)
