@@ -39,7 +39,7 @@ def instance_norm(x):
 
     mean, var = tf.nn.moments(x, [1, 2], keep_dims=True)
 
-    return tf.div(tf.sub(x, mean), tf.sqrt(tf.add(var, epsilon)))
+    return tf.div(tf.subtract(x, mean), tf.sqrt(tf.add(var, epsilon)))
 
 
 def residual(x, filters, kernel, strides):
