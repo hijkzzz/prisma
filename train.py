@@ -62,8 +62,8 @@ def optimize():
         images = reader.image(FLAGS.BATCH_SIZE, FLAGS.IMAGE_SIZE,
                               FLAGS.TRAIN_IMAGES_FOLDER, FLAGS.EPOCHS)
 
-        generated = transform.net(images / 255.0, training=True)
-        net, _ = vgg.net(FLAGS.VGG_PATH, tf.concat([generated, images], 0))
+        generated = transform.net(images - vgg.MEAN_PIXEL, training=True)
+        net, _ = vgg.net(FLAGS.VGG_PATH, tf.concat([generated, images] - vgg.MEAN_PIXEL, 0))
 
         # 损失函数
         content_loss = loss.content_loss(net, content_layers)

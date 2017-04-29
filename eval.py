@@ -37,10 +37,18 @@ def generate():
     tf.logging.info('Image size: %dx%d' % (width, height))
 
     with tf.Graph().as_default(), tf.Session() as sess:
-        content_image = reader.get_image(FLAGS.CONTENT_IMAGE, max(height, width))
+        # 读取图片文件
+        path = FLAGS.CONTENT_IMAGE
+        png = path.lower().endswith('png')
+        img_bytes = tf.read_file(path)
+
+        # 图片解码
+        content_image = tf.image.decode_png(img_bytes, channels=3) if png else tf.image.decode_jpeg(img_bytes, channels=3)
+        content_image = tf.image.convert_image_dtype(content_image, tf.float32) * 255.0
         content_image = tf.expand_dims(content_image, 0)
-        generated_images = transform.net(content_image / 255.0, training=False)
-        output_format = tf.saturate_cast(generated_images + vgg.MEAN_PIXEL, tf.uint8)
+
+        generated_images = transform.net(content_image - vgg.MEAN_PIXEL, training=False)
+        output_format = tf.saturate_cast(generated_images, tf.uint8)
 
         # 开始转换
         saver = tf.train.Saver(tf.global_variables(), write_version=tf.train.SaverDef.V1)

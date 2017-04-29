@@ -23,7 +23,7 @@ def get_style_features(style_paths, style_layers, image_size, style_scale, vgg_p
         size = int(round(image_size * style_scale))
         images = tf.stack(
             [reader.get_image(path, size) for path in style_paths])
-        net, _ = vgg.net(vgg_path, images)
+        net, _ = vgg.net(vgg_path, images - vgg.MEAN_PIXEL)
         features = []
         for layer in style_layers:
             features.append(gram(net[layer]))
