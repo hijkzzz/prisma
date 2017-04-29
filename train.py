@@ -63,7 +63,7 @@ def optimize():
                               FLAGS.TRAIN_IMAGES_FOLDER, FLAGS.EPOCHS)
 
         generated = transform.net(images - vgg.MEAN_PIXEL, training=True)
-        net, _ = vgg.net(FLAGS.VGG_PATH, tf.concat([generated, images] - vgg.MEAN_PIXEL, 0))
+        net, _ = vgg.net(FLAGS.VGG_PATH, tf.concat([generated, images], 0) - vgg.MEAN_PIXEL)
 
         # 损失函数
         content_loss = loss.content_loss(net, content_layers)
