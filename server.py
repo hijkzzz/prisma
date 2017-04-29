@@ -32,7 +32,7 @@ def transform():
     # 检查参数
     if filename is None or image is None or email is None or model is None:
         return jsonify(status='PARAMS ERROR')
-    if splitext(filename)[1] not in app.config['ALLOWED_EXTENSIONS']:
+    if re.match("^[a-zA-Z0-9_\\-.]+$", filename) is None or splitext(filename)[1] not in app.config['ALLOWED_EXTENSIONS']:
         return jsonify(status='FILENAME NOT SUPPORT')
     if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", email) is None:
         return jsonify(status='EMAIL FORMAT ERROR')
@@ -56,11 +56,16 @@ def transform():
 
 @celery.task
 def transform_async(filename, email, model):
-    # 开始转换 
+    # 开始转换
     content_file_path = join(app.config['UPLOAD_FOLDER'], filename)
     model_file_path = join(app.config['MODEL_FOLDER'], model)
     output_folder = app.config['OUTPUT_FOLDER']
-    output_file_path = join(output_folder, filename)
+
+    output_filename = filename
+    (shotname, extension) = splitext(output_filename)
+    output_filename = shotname + '-' + model + extension
+    output_file_path = join(output_folder, output_filename)
+
     command = 'python eval.py --CONTENT_IMAG %s --MODEL_PATH %s -- OUTPUT_FOLDER %s' % (
         content_file_path, model_file_path, output_folder)
     status, output = commands.getstatusoutput(command)
@@ -71,7 +76,7 @@ def transform_async(filename, email, model):
     if status == 0:
         with app.app_context():
             msg = Message("IMAGE-STYLE-TRANSFER",
-                        sender=app.config['MAIL_USERNAME'], recipients=[email])
+                          sender=app.config['MAIL_USERNAME'], recipients=[email])
             msg.body = filename
             with app.open_resource(output_file_path) as f:
                 mime_type = 'image/jpg' if splitext(
@@ -81,7 +86,7 @@ def transform_async(filename, email, model):
     else:
         with app.app_context():
             msg = Message("IMAGE-STYLE-TRANSFER",
-                        sender=app.config['MAIL_USERNAME'], recipients=[email])
+                          sender=app.config['MAIL_USERNAME'], recipients=[email])
             msg.body = "CONVERT ERROR\n" + filename
             mail.send(msg)
 
