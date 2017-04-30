@@ -8,7 +8,7 @@ MAIL_PROT = 465
 MAIL_USE_TLS = True
 MAIL_USE_SSL = False
 MAIL_USERNAME = 'hujia_n@foxmail.com'
-MAIL_PASSWORD = ''
+MAIL_PASSWORD = 'kvwdmvajkplybihj'
 MAIL_DEBUG = True
 
 UPLOAD_FOLDER = 'raw-images/'
@@ -16,5 +16,5 @@ ALLOWED_EXTENSIONS = set(['.png', '.jpg', '.jpeg'])
 MAX_CONTENT_LENGTH = 4 * 1024 * 1024
 
 MODEL_FOLDER = 'models/'
-MODEL_FILES = set(['shinkai.ckpt'])
+MODEL_FILES = set(['crayon.ckpt', 'feathers.ckpt', 'sketch.ckpt', 'starry.ckpt', 'ink.ckpt'])
 OUTPUT_FOLDER = 'output-images/'

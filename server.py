@@ -17,6 +17,11 @@ celery = Celery(
     app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
+@app.route('/help', methods=['GET'])
+def help():
+    return jsonify(status='HELP_SUCCESS', models=list(app.config['MODEL_FILES']), \
+        format='{email:xxx(receive output), filename:xxx(jpg or png), model:xxx(see models), image:xxxx(base64 encode image)}')
+
 
 @app.route('/transform', methods=['POST'])
 def transform():
@@ -87,7 +92,7 @@ def transform_async(filename, email, model):
         with app.app_context():
             msg = Message("IMAGE-STYLE-TRANSFER",
                           sender=app.config['MAIL_USERNAME'], recipients=[email])
-            msg.body = "CONVERT ERROR\n" + filename
+            msg.body = "CONVERT ERROR\n" + filename + "\n HELP - http://host:port/help"
             mail.send(msg)
 
     remove_files.apply_async(
@@ -107,4 +112,4 @@ if __name__ == '__main__':
     if not exists(app.config['OUTPUT_FOLDER']):
         mkdir(app.config['OUTPUT_FOLDER'])
 
-    app.run(debug=False)
+    app.run(host='0.0.0.0')
