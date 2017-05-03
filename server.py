@@ -8,6 +8,7 @@ import re
 import time
 import base64
 import commands
+import json
 
 
 app = Flask(__name__)
@@ -17,16 +18,27 @@ celery = Celery(
     app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
+
+@app.route('/', methods=['GET'])
+def home():
+    return app.send_static_file('index.html')
+
+
+@app.route('/models', methods=['GET'])
+def models():
+    pass
+
+
 @app.route('/help', methods=['GET'])
 def help():
     return jsonify(status='HELP_SUCCESS', models=list(app.config['MODEL_FILES']), \
-        format='{email:xxx(receive output), filename:xxx(jpg or png), model:xxx(see models), image:xxxx(base64 encode image)}')
+        format='/transform: {email:xxx(receive output), filename:xxx(jpg or png), model:xxx(see models), image:xxxx(base64 encode image)}')
 
 
 @app.route('/transform', methods=['POST'])
 def transform():
     # 获取参数
-    json_data = request.get_json()
+    json_data = json.loads(request.get_data())
     filename = json_data.get(u'filename').encode('ascii')
     image = json_data.get(u'image').encode('ascii')
     email = json_data.get(u'email').encode('ascii')
@@ -112,4 +124,4 @@ if __name__ == '__main__':
     if not exists(app.config['OUTPUT_FOLDER']):
         mkdir(app.config['OUTPUT_FOLDER'])
 
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)

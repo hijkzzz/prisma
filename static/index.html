@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Prisma</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- User CSS -->
+    <style>
+        body {
+            min-height: 2000px;
+            padding-top: 70px;
+        }   
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+                <a class="navbar-brand" href="#">Prisma</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5">
+                <h1>PHOTO</h1>
+                <p style="font-size: large">Upload photo</p>
+                <br/>
+                <div name="image" id="dropbox" style="min-height:200px;border:3px dashed silver;">
+                    <p style="text-align: center; line-height: 200px;font-size: medium">Drop your photo here.</p>
+                </div>
+            </div>
+            <div class="col-md-1"></div>
+            <div class="col-md-6">
+                <h1>STYLE</h1>
+                <p style="font-size: large">Popular styles</p>
+                <br/>
+            </div>
+        </div>
+        <br/>
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <form class="form" id="imform">
+                    <div class="form-group">
+                        <label class="sr-only" for="email">Email</label>
+                        <div class="input-group">
+                            <div class="input-group-addon"></div>
+                            <input type="email" class="form-control" id="email" placeholder="Email" >
+                        </div>
+                    </div>
+                    <button type="submit" id="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+<!-- /container -->
+
+
+<!-- Bootstrap core JavaScript
+    ================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<!-- User JavaScript-->
+<script>
+    // 全局变量
+    var model;
+    var image_file;
+    var image_b64;
+
+    // 拖拽事件
+    $(document).bind({
+        'drop' : function(event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+    });
+
+    $('#dropbox').bind({
+        'dragenter' : function(event) {
+            $(this).css('borderColor', 'gray');
+            $(this).css('backgroundColor', 'white');
+            event.stopPropagation();
+            event.preventDefault(); 
+        },
+        'dragleave' : function(event) {
+            $(this).css('borderColor', 'silver');
+            $(this).css('backgroundColor', 'transparent');
+            event.stopPropagation();
+            event.preventDefault();
+        },
+        'dragover' : function(event) {
+            event.stopPropagation();
+            event.preventDefault();
+        },
+        'drop' : function(event) {
+            // 检查拖入的图片
+            image_file = event.originalEvent.dataTransfer.files[0];
+            if(!/image\/(jpeg|jpg|png)/.test(image_file.type)){ 
+                alert("文件格式不支持!"); 
+                return false; 
+            }
+
+            // 读取并且编码图片
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                result = event.target.result; 
+                $('#dropbox').html('<img src="' + result + '" alt="" class="img-responsive"/>');
+                image_b64 = result.replace(/data:image\/(png|jpeg|jpg);base64,/, '');
+            };
+            reader.readAsDataURL(image_file);
+
+            event.stopPropagation();
+            event.preventDefault(); 
+        }
+    });
+
+    // 提交事件
+    $('#imform').bind({
+        'submit' : function(event) {
+            model = 'ink.ckpt';
+            var email = $('#email').val();
+
+            if (image_file == undefined) {
+                alert('未选取上传图片!');
+                return false;
+            }            
+            if (image_b64 == undefined) {
+                alert('上传图片读取失败!')
+                return false;
+            }
+            if (model == undefined) {
+                alert('未选取风格模型!');
+                return false;
+            }
+            if (!/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/.test(email)) {
+                alert('邮件地址有误')
+                return false;
+            }
+
+            // 发送请求 
+            json_data = {'email': email, 'model': model, 'filename': image_file.name, 'image': image_b64, };
+
+            $.ajax({
+                'method': 'POST',
+                'url': '/transform',
+                'data': JSON.stringify(json_data),
+                'dataType': 'json',
+                'success': function(data, textStatus, jqXHR){
+                    var json_data = eval(data);
+                    alert(json_data.status);
+                },
+                'error': function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert(textStatus);
+                }
+            });
+
+            event.stopPropagation();
+            event.preventDefault(); 
+        }
+    });
+
+</script>
+
+</body>
+</html>
