@@ -57,9 +57,9 @@ python3 server.py
 
 # Training
 - Download COCO dataset and VGG19 model
->[COCO dataset](http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat)
+>[VGG19 model](http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat)
 
->[VGG19 model](http://msvocds.blob.core.windows.net/coco2014/train2014.zip)
+>[COCO dataset](http://msvocds.blob.core.windows.net/coco2014/train2014.zip)
 
 - Put the model and dataset into the project root directory
 
