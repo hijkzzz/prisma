@@ -66,14 +66,24 @@ python3 server.py
 ```
 # Recommend using tensorflow of gpu version
 
-python3 train.py --STYLE_IMAGES style-image.jpg --CONTENT_WEIGHT 1.0 --STYLE_WEIGHT 10.0 --MODEL_PATH models/style-image.ckpt
+python3 train.py --STYLE_IMAGES style-image.jpg --CONTENT_WEIGHT 1.0 --STYLE_WEIGHT 10.0 --MODEL_PATH models/newmodel.ckpt
+
+mv models/newmodel.ckpt-done models/newmodel.ckpt
 
 # Test
-python3 eval.py --CONTENT_PATH content-image.jpg --MODEL_PATH models/style.image.ckpt-done --OUTPUT_FOLDER output-images/
+python3 eval.py --CONTENT_PATH content-image.jpg --MODEL_PATH models/newmodel.ckpt --OUTPUT_FOLDER output-images/
 ```
 
+- Add to Flask app
+```
+vim default_config.py
+
+MODEL_FILES = set(['newmodel.ckpt', xxxxxx])
+```
+- **Copy a stylized sample（Named newmodel.jpg）into static/models_image/**
+
 ## Screenshot
->Visit: http://localhost:5000/
+>http://localhost:5000/
 
 ![](https://github.com/hijkzzz/image-style-transfer/blob/master/screenshot.jpeg?raw=true)
 
