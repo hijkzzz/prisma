@@ -17,7 +17,7 @@ if __name__ == '__main__':
     headers = {"Content-Type":"application/json"}
     data = {"filename":basename(args.FILEPATH), "model":args.MODEL, "email":args.EMAIL}
     if not exists(args.FILEPATH):
-        print "{} FILE NOT EXISTS".format(args.FILEPATH)
+        print("{} FILE NOT EXISTS".format(args.FILEPATH))
         sys.exit()
     with open(args.FILEPATH, "rb") as f:
         data["image"] = base64.b64encode(f.read())
