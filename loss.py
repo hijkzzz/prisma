@@ -1,5 +1,3 @@
-# coding=utf-8
-
 import tensorflow as tf
 import vgg
 import reader

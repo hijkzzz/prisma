@@ -1,4 +1,3 @@
-# coding=utf-8
 from flask import Flask, request, jsonify
 from flask_mail import Mail, Message
 from celery import Celery
@@ -7,8 +6,8 @@ from os.path import join, exists, splitext
 import re
 import time
 import base64
-import commands
 import json
+import subprocess
 
 
 app = Flask(__name__)
@@ -24,11 +23,6 @@ def home():
     return app.send_static_file('index.html')
 
 
-@app.route('/models', methods=['GET'])
-def models():
-    pass
-
-
 @app.route('/help', methods=['GET'])
 def help():
     return jsonify(status='HELP_SUCCESS', models=list(app.config['MODEL_FILES']), \
@@ -39,12 +33,12 @@ def help():
 def transform():
     # 获取参数
     json_data = json.loads(request.get_data())
-    filename = json_data.get(u'filename').encode('ascii')
-    image = json_data.get(u'image').encode('ascii')
-    email = json_data.get(u'email').encode('ascii')
-    model = json_data.get(u'model').encode('ascii')
+    filename = json_data.get('filename')
+    model = json_data.get('model')
+    image = json_data.get('image')
+    email = json_data.get('email')
 
-    print len(image), filename, email, model
+    app.logger.info("%s %d %s %s", filename, len(image), model, email)
 
     # 检查参数
     if filename is None or image is None or email is None or model is None:
@@ -85,9 +79,10 @@ def transform_async(filename, email, model):
 
     command = 'python eval.py --CONTENT_IMAG %s --MODEL_PATH %s -- OUTPUT_FOLDER %s' % (
         content_file_path, model_file_path, output_folder)
-    status, output = commands.getstatusoutput(command)
+    status, output = subprocess.getstatusoutput(command)
 
-    print status, output
+    # 打印日志
+    print(status, output)
 
     # 发送邮件
     if status == 0:

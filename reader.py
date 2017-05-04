@@ -1,5 +1,3 @@
-# coding=utf-8
-
 from os import listdir, remove
 from os.path import exists, join, isfile
 import tensorflow as tf

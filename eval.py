@@ -1,11 +1,8 @@
-# coding=utf-8
-
 import os
 import tensorflow as tf
 from scipy import misc
 import vgg
 import transform
-import reader
 
 tf.app.flags.DEFINE_string("MODEL_PATH", "models/fast-style-model.ckpt-done", "Pre-trained models")
 tf.app.flags.DEFINE_string("CONTENT_IMAGE", "raw-images/content-image.png", "Path to content image")

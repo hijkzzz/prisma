@@ -1,5 +1,3 @@
-# coding=utf-8
-
 import requests
 import json
 import base64
@@ -16,8 +14,6 @@ if __name__ == '__main__':
     parser.add_argument("--MODEL", help="Model name", type=str, required=True)
     args = parser.parse_args()
 
-    print args
-
     headers = {"Content-Type":"application/json"}
     data = {"filename":basename(args.FILEPATH), "model":args.MODEL, "email":args.EMAIL}
     if not exists(args.FILEPATH):
@@ -28,4 +24,4 @@ if __name__ == '__main__':
 
     url = "http://" + args.SERVER + "/transform"
     r = requests.post(url=url, headers=headers, data=json.dumps(data))
-    print r.text
+    print(r.text)
