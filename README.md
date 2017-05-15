@@ -61,7 +61,7 @@ python3 server.py
 
 >[COCO dataset](http://msvocds.blob.core.windows.net/coco2014/train2014.zip)
 
-- Put the model and dataset into the project root directory
+- Put the model and dataset into "prisma/"
 
 ```
 # Recommend using tensorflow of gpu version
@@ -80,7 +80,7 @@ vim default_config.py
 
 MODEL_FILES = set(['newmodel.ckpt', ......])
 ```
-- **And then, put a sample image (Named "newmodel.jpg") into "static/models_image/"
+- And then, put a sample image (Named "newmodel.jpg") into "static/models_image/"
 
 ## Screenshot
 >http://localhost:5000/
