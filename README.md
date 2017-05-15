@@ -1,35 +1,35 @@
-# image-style-transfer
+# prisma
 ![Build Status](https://img.shields.io/teamcity/codebetter/bt428.svg)
 
-Online image style transfer application
+ONLINE IMAGE STYLE TRANSFER
 
 ## Requirements
 
-- Python 3.6
-- Tensorflow 1.1.0
+- Python 3+
+- Tensorflow 1.1.0+
 - Scipy
-- Flask 0.12
-- Flask-Mail 0.9.1
-- Celery 4.0.2
+- Flask
+- Flask-Mail
+- Celery
 - Redis
 
 ## Setup
 - Install Dependencies
 ```
-pip3 install numpy scipy matplotlib ipython jupyter pandas sympy nose
+pip3 install numpy scipy
 pip3 install flask flask-mail celery
-pip3 install --upgrade tensorflow
+pip3 install tensorflow // for cpu
 ```
 - Download Models
 >http://pan.baidu.com/s/1pLPSXdx
 
 ```
-# Put models into project root directory 
+# Put models into prisma/
 
-mv models/ image-style-transfer/
+mv models/ prisma/
 ```
 
-- Configuring Ｍailbox
+- Configuring Mailbox
 ```
 vim　default_config.py
 
@@ -78,9 +78,9 @@ python3 eval.py --CONTENT_PATH content-image.jpg --MODEL_PATH models/newmodel.ck
 ```
 vim default_config.py
 
-MODEL_FILES = set(['newmodel.ckpt', xxxxxx])
+MODEL_FILES = set(['newmodel.ckpt', ......])
 ```
-- **Copy a stylized sample（Named newmodel.jpg）into static/models_image/**
+- **And then, put a sample image (Named "newmodel.jpg") into "static/models_image/"
 
 ## Screenshot
 >http://localhost:5000/
