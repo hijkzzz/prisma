@@ -16,8 +16,8 @@ ONLINE IMAGE STYLE TRANSFER
 ## Setup
 - Install Dependencies
 ```
-pip3 install numpy scipy
-pip3 install flask flask-mail celery
+pip3 install numpy pillow scipy
+pip3 install flask flask-mail celery redis
 pip3 install tensorflow // for cpu
 ```
 - Download Models
@@ -40,9 +40,16 @@ MAIL_USERNAME = 'xxxxxx'
 MAIL_PASSWORD = 'xxxxxx'
 ```
 
-- Run Redis
+- Install Redis
 ```
-sh ./run-redis.sh
+curl -O http://download.redis.io/redis-stable.tar.gz
+tar xvzf redis-stable.tar.gz
+rm redis-stable.tar.gz
+
+cd redis-stable/src/redis-server
+make
+
+./redis-server // run redis
 ```
 
 - Run Celery
@@ -52,7 +59,8 @@ celery -A server.celery worker
 
 - Run Flask
 ```
-python3 server.py
+export FLASK_APP=server.py
+flask run
 ```
 
 # Training

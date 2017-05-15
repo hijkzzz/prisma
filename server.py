@@ -32,7 +32,7 @@ def help():
 @app.route('/transform', methods=['POST'])
 def transform():
     # 获取参数
-    json_data = json.loads(request.get_data())
+    json_data = json.loads(request.get_data().decode(encoding='utf-8'))
     filename = json_data.get('filename')
     model = json_data.get('model')
     image = json_data.get('image')
