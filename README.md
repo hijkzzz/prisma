@@ -29,16 +29,20 @@ mv models/ prisma/
 
 - Mailbox
 ```
-vim　default_config.py
+default_config.py
 
 MAIL_SERVER = 'xxxxx'
 MAIL_PORT = xxx
-
 MAIL_USERNAME = 'xxxxxx'
 MAIL_PASSWORD = 'xxxxxx'
 ```
 
 - Run Redis
+```
+default_config.py
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+```
 
 - Run Celery
 ```
@@ -48,7 +52,7 @@ celery -A server.celery worker
 - Run Flask
 ```
 export FLASK_APP=server.py
-flask run
+flask run --host=0.0.0.0
 ```
 
 ## Training
@@ -61,18 +65,17 @@ flask run
 
 ```
 # Recommend using tensorflow of gpu version
-
 python3 train.py --STYLE_IMAGES style-image.jpg --CONTENT_WEIGHT 1.0 --STYLE_WEIGHT 10.0 --MODEL_PATH models/newmodel.ckpt
 
 mv models/newmodel.ckpt-done models/newmodel.ckpt
 
 # Test
-python3 eval.py --CONTENT_PATH content-image.jpg --MODEL_PATH models/newmodel.ckpt --OUTPUT_FOLDER output-images/
+python3 eval.py --CONTENT_IMAGE content-image.jpg --MODEL_PATH models/newmodel.ckpt --OUTPUT_FOLDER generate/
 ```
 
 - Add to Flask app
 ```
-vim default_config.py
+default_config.py
 
 MODEL_FILES = set(['newmodel.ckpt', ......])
 
