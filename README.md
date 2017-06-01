@@ -14,7 +14,7 @@ ONLINE IMAGE STYLE TRANSFER
 - Redis
 
 ## Setup
-- Install Dependencies
+- Dependencies
 ```
 pip3 install numpy pillow scipy
 pip3 install flask flask-mail celery redis
@@ -24,12 +24,10 @@ pip3 install tensorflow // for cpu
 >http://pan.baidu.com/s/1pLPSXdx
 
 ```
-# Put models into prisma/
-
 mv models/ prisma/
 ```
 
-- Configuring Mailbox
+- Mailbox
 ```
 vim　default_config.py
 
@@ -40,17 +38,7 @@ MAIL_USERNAME = 'xxxxxx'
 MAIL_PASSWORD = 'xxxxxx'
 ```
 
-- Install Redis
-```
-curl -O http://download.redis.io/redis-stable.tar.gz
-tar xvzf redis-stable.tar.gz
-rm redis-stable.tar.gz
-
-cd redis-stable/src/redis-server
-make
-
-./redis-server // run redis
-```
+- Run Redis
 
 - Run Celery
 ```
@@ -63,7 +51,7 @@ export FLASK_APP=server.py
 flask run
 ```
 
-# Training
+## Training
 - Download COCO dataset and VGG19 model
 >[VGG19 model](http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat)
 
@@ -87,8 +75,9 @@ python3 eval.py --CONTENT_PATH content-image.jpg --MODEL_PATH models/newmodel.ck
 vim default_config.py
 
 MODEL_FILES = set(['newmodel.ckpt', ......])
+
+# Put a sample image (Named "newmodel.jpg") into "static/models_image/"
 ```
-- And then, put a sample image (Named "newmodel.jpg") into "static/models_image/"
 
 ## Screenshot
 >http://localhost:5000/
