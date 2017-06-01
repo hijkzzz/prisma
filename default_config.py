@@ -9,11 +9,11 @@ MAIL_USERNAME = ''
 MAIL_PASSWORD = ''
 MAIL_DEBUG = True
 
-UPLOAD_FOLDER = 'raw-images/'
+UPLOAD_FOLDER = 'content/'
 ALLOWED_EXTENSIONS = set(['.png', '.jpg', '.jpeg'])
 MAX_CONTENT_LENGTH = 4 * 1024 * 1024
 
 MODEL_FOLDER = 'models/'
 MODEL_FILES = set(['crayon.ckpt', 'feathers.ckpt', 'sketch.ckpt',
                    'starry.ckpt', 'ink.ckpt', 'mosaic.ckpt', 'wave.ckpt'])
-OUTPUT_FOLDER = 'output-images/'
+OUTPUT_FOLDER = 'generate/'

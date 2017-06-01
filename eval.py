@@ -5,8 +5,8 @@ import vgg
 import transform
 
 tf.app.flags.DEFINE_string("MODEL_PATH", "models/fast-style-model.ckpt-done", "Pre-trained models")
-tf.app.flags.DEFINE_string("CONTENT_IMAGE", "raw-images/content-image.png", "Path to content image")
-tf.app.flags.DEFINE_string("OUTPUT_FOLDER", "output-images/", "Path to output image")
+tf.app.flags.DEFINE_string("CONTENT_IMAGE", "content/content-image.png", "Path to content image")
+tf.app.flags.DEFINE_string("OUTPUT_FOLDER", "generate/", "Path to output image")
 tf.app.flags.DEFINE_integer("BATCH_SIZE", 1, "Number of concurrent images to train on")
 
 FLAGS = tf.app.flags.FLAGS

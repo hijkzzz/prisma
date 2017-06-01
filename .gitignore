@@ -1,11 +1,9 @@
 .vscode/
 .DS_Store
 tags
-
 *.pyc
 models/
-
+content/
+generate/
 imagenet-vgg-verydeep-19.mat
 train2014/
-
-redis-stable/

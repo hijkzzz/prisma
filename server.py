@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+﻿from flask import Flask, request, jsonify
 from flask_mail import Mail, Message
 from celery import Celery
 from os import mkdir, remove
@@ -119,4 +119,4 @@ if __name__ == '__main__':
     if not exists(app.config['OUTPUT_FOLDER']):
         mkdir(app.config['OUTPUT_FOLDER'])
 
-    app.run(host='0.0.0.0', debug=True)
+    app.run()
