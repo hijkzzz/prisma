@@ -42,6 +42,7 @@ MAIL_PASSWORD = 'xxxxxx'
 default_config.py
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
+./redis-server
 ```
 
 - Run Celery
@@ -51,8 +52,7 @@ celery -A server.celery worker
 
 - Run Flask
 ```
-export FLASK_APP=server.py
-flask run --host=0.0.0.0
+python server.py
 ```
 
 ## Training

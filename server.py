@@ -77,7 +77,7 @@ def transform_async(filename, email, model):
     output_filename = shotname + '-' + model + extension
     output_file_path = join(output_folder, output_filename)
 
-    command = 'python eval.py --CONTENT_IMAG %s --MODEL_PATH %s -- OUTPUT_FOLDER %s' % (
+    command = 'python eval.py --CONTENT_IMAG %s --MODEL_PATH %s --OUTPUT_FOLDER %s' % (
         content_file_path, model_file_path, output_folder)
     status, output = subprocess.getstatusoutput(command)
 
@@ -119,4 +119,4 @@ if __name__ == '__main__':
     if not exists(app.config['OUTPUT_FOLDER']):
         mkdir(app.config['OUTPUT_FOLDER'])
 
-    app.run()
+    app.run(host='0.0.0.0')

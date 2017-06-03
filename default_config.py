@@ -9,7 +9,7 @@ MAIL_USERNAME = ''
 MAIL_PASSWORD = ''
 MAIL_DEBUG = True
 
-UPLOAD_FOLDER = 'content/'
+UPLOAD_FOLDER = 'upload/'
 ALLOWED_EXTENSIONS = set(['.png', '.jpg', '.jpeg'])
 MAX_CONTENT_LENGTH = 4 * 1024 * 1024
 
