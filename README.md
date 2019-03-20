@@ -1,7 +1,6 @@
 # prisma
-![Build Status](https://img.shields.io/teamcity/codebetter/bt428.svg)
 
-ONLINE IMAGE STYLE TRANSFER
+Online fast neural style transfer
 
 ## Requirements
 
