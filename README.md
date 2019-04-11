@@ -72,13 +72,13 @@ mv models/newmodel.ckpt-done models/newmodel.ckpt
 python3 eval.py --CONTENT_IMAGE content-image.jpg --MODEL_PATH models/newmodel.ckpt --OUTPUT_FOLDER generate/
 ```
 
-- Add to Flask app
+- Add to Prisma
 ```
 default_config.py
 
 MODEL_FILES = set(['newmodel.ckpt', ......])
 
-# Put a sample image (Named "newmodel.jpg") into "static/models_image/"
+# Put a example image ("newmodel.jpg") into "static/models_image/"
 ```
 
 ## Screenshot
